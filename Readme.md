@@ -3,6 +3,10 @@
 
   A proxying in-memory cache for node.
 
+## Installation
+
+    $ npm install ivolo/proxy-cache
+
 ## Examples
 
 ```js
@@ -39,4 +43,19 @@ db.getUserById('id', function (err, user) {
   stale  : false,
   peek   : true // peek by default so maxAge is honored.
 }
+```
+
+## License
+
+```
+WWWWWW||WWWWWW
+ W W W||W W W
+      ||
+    ( OO )__________
+     /  |           \
+    /o o|    MIT     \
+    \___/||_||__||_|| *
+         || ||  || ||
+        _||_|| _||_||
+       (__|__|(__|__|
 ```
