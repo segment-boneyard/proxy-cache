@@ -1,11 +1,10 @@
-
 # proxy-cache
 
   A proxying in-memory cache for node.
 
 ## Installation
 
-    $ npm install ivolo/proxy-cache
+    $ npm install segmentio/proxy-cache
 
 ## Examples
 
