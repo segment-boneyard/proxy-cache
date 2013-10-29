@@ -30,7 +30,7 @@ db.getUserById('id', function (err, user) {
   
   Generate a proxying a cache, with all properties of `instance` fully proxied, and all instance `methods` wrapped with a cache.
 
-  You can also optionally pass in custom options, which line up exactly with [isaacs/node-lru-cache](https://github.com/isaacs/node-lru-cache#options) options. Defaults:
+  You can also optionally pass in custom `options`, which line up exactly with [isaacs/node-lru-cache](https://github.com/isaacs/node-lru-cache#options) options. Here are the defaults:
 
 ```js
 {
