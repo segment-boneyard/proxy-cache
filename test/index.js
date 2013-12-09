@@ -97,4 +97,22 @@ describe('proxy-cache', function () {
       });
     });
   });
+
+  it('should callback asynchronously', function (done) {
+    var db = cache(new DB(), ['getById']);
+    var obj = { id: 'id' };
+    db.save(obj);
+    db.getById(obj.id, function (err, result) {
+      assert(!err);
+      assert.deepEqual(obj, result);
+      assert(db.parent.queries === 1);
+      var async;
+      db.getById(obj.id, function (err, result) {
+        assert(async);
+        done();
+      });
+      async = true;
+    });
+
+  });
 });
