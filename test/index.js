@@ -23,7 +23,6 @@ DB.prototype.getById = function (id, callback) {
   return callback(null, this.db[id]);
 };
 
-
 DB.prototype.getByType = function (type, id, callback) {
   this.queries += 1;
   return callback(null, this.db[id]);
@@ -113,6 +112,22 @@ describe('proxy-cache', function () {
       });
       async = true;
     });
+  });
 
+
+  it('should cache empty entries', function (done) {
+    var db = cache(new DB(), ['getById']);
+    var id = 'non-existant';
+    db.getById(id, function (err, result) {
+      assert(!err);
+      assert.equal(result, undefined);
+      assert.equal(db.parent.queries, 1);
+      db.getById(id, function (err, result) {
+        assert(!err);
+        assert.equal(result, undefined);
+        assert.equal(db.parent.queries, 1);     
+        done()
+      })
+    })
   });
 });

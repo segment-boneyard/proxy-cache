@@ -35,10 +35,11 @@ db.getUserById('id', function (err, user) {
 
 ```js
 {
-  max    : 10000,
-  maxAge : ms('1m'),
-  stale  : false,
-  peek   : true // peek by default so maxAge is honored.
+  max: 10000,
+  maxAge: ms('1m'),
+  stale: false,
+  peek: true, // peek by default so maxAge is honored
+  tombstone: true // save undefined values returned as well
 }
 ```
 
