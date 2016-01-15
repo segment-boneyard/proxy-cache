@@ -114,7 +114,6 @@ describe('proxy-cache', function () {
     });
   });
 
-
   it('should cache empty entries', function (done) {
     var db = cache(new DB(), ['getById']);
     var id = 'non-existant';
@@ -125,9 +124,92 @@ describe('proxy-cache', function () {
       db.getById(id, function (err, result) {
         assert(!err);
         assert.equal(result, undefined);
-        assert.equal(db.parent.queries, 1);     
+        assert.equal(db.parent.queries, 1);
         done()
       })
     })
   });
+
+  it('should incr a miss', function(done){
+    var stats = memstats();
+    var db = cache(new DB(), ['getById'], { stats: stats });
+    db.getById('miss', function(err){
+      if (err) return done(err);
+      assert.deepEqual(stats.counts, [
+        ['calls', 1, ['method:getById']],
+        ['miss', 1, ['method:getById']]
+      ]);
+      done();
+    });
+  })
+
+  it('should incr a hit', function(done){
+    var stats = memstats();
+    var db = cache(new DB(), ['getById'], { stats: stats });
+    db.save({ id: 1 });
+    db.getById(1, function(err){
+      if (err) return done(err);
+      db.getById(1, function(err){
+        if (err) return done(err);
+        assert.deepEqual(stats.counts, [
+          ['calls', 1, ['method:getById']],
+          ['miss', 1, ['method:getById']],
+          ['calls', 1, ['method:getById']],
+          ['hit', 1, ['method:getById']]
+        ]);
+        done();
+      });
+    });
+  })
+
+  it('should track method durations', function(done){
+    var stats = memstats();
+    var db = cache(new DB(), ['getById'], { stats: stats });
+    db.save({ id: 1 });
+    db.getById(1, function(err){
+      if (err) return done(err);
+      db.getById(1, function(err){
+        if (err) return done(err);
+        assert.equal(1, stats.timers.length);
+        assert.equal('duration', stats.timers[0][0]);
+        assert.equal('number', typeof stats.timers[0][1]);
+        assert.deepEqual(['method:getById'], stats.timers[0][2]);
+        done();
+      });
+    });
+  })
+
+  it('should gauge cache size', function(done){
+    var stats = memstats();
+    var db = cache(new DB(), ['getById'], { stats: stats });
+    db.save({ id: 1 });
+    db.getById(1, function(err){
+      if (err) return done(err);
+      db.getById(1, function(err){
+        if (err) return done(err);
+        assert.deepEqual(stats.gauges, [
+          ['size', 0, ['method:getById']],
+          ['size', 1, ['method:getById']]
+        ]);
+        done();
+      });
+    });
+  })
 });
+
+function memstats(){
+  return {
+    gauges: [],
+    counts: [],
+    timers: [],
+    gauge: function(key, count, tags){
+      this.gauges.push([key, count, tags]);
+    },
+    incr: function(key, count, tags){
+      this.counts.push([key, count, tags]);
+    },
+    timer: function(key, ms, tags){
+      this.timers.push([key, ms, tags]);
+    }
+  };
+}
