@@ -29,7 +29,6 @@ DB.prototype.getByType = function (type, id, callback) {
 };
 
 describe('proxy-cache', function () {
-
   it('should proxy all methods', function () {
     var db = cache(new DB(), ['getAndError', 'getById']);
     assert(typeof db.save === 'function');
@@ -194,7 +193,22 @@ describe('proxy-cache', function () {
         done();
       });
     });
-  })
+  });
+
+  it('should shallow clone', function(done){
+    var db = cache(new DB(), ['getById']);
+    var item = { stuff: [], id: 1 };
+    db.save(item);
+    db.getById(item.id, function(err){
+      if (err) return done(err);
+      db.getById(item.id, function(err, res){
+        if (err) return done(err);
+        assert(item.stuff == res.stuff, 'expected shallow clone');
+        assert(item != res);
+        done();
+      });
+    });
+  });
 });
 
 function memstats(){
@@ -213,3 +227,4 @@ function memstats(){
     }
   };
 }
+
