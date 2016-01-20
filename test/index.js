@@ -135,8 +135,8 @@ describe('proxy-cache', function () {
     db.getById('miss', function(err){
       if (err) return done(err);
       assert.deepEqual(stats.counts, [
-        ['calls', 1, ['method:getById']],
-        ['miss', 1, ['method:getById']]
+        ['proxy-cache.calls', 1, ['method:getById']],
+        ['proxy-cache.miss', 1, ['method:getById']]
       ]);
       done();
     });
@@ -151,10 +151,10 @@ describe('proxy-cache', function () {
       db.getById(1, function(err){
         if (err) return done(err);
         assert.deepEqual(stats.counts, [
-          ['calls', 1, ['method:getById']],
-          ['miss', 1, ['method:getById']],
-          ['calls', 1, ['method:getById']],
-          ['hit', 1, ['method:getById']]
+          ['proxy-cache.calls', 1, ['method:getById']],
+          ['proxy-cache.miss', 1, ['method:getById']],
+          ['proxy-cache.calls', 1, ['method:getById']],
+          ['proxy-cache.hit', 1, ['method:getById']]
         ]);
         done();
       });
@@ -170,7 +170,7 @@ describe('proxy-cache', function () {
       db.getById(1, function(err){
         if (err) return done(err);
         assert.equal(1, stats.timers.length);
-        assert.equal('duration', stats.timers[0][0]);
+        assert.equal('proxy-cache.duration', stats.timers[0][0]);
         assert.equal('number', typeof stats.timers[0][1]);
         assert.deepEqual(['method:getById'], stats.timers[0][2]);
         done();
@@ -187,8 +187,8 @@ describe('proxy-cache', function () {
       db.getById(1, function(err){
         if (err) return done(err);
         assert.deepEqual(stats.gauges, [
-          ['size', 0, ['method:getById']],
-          ['size', 1, ['method:getById']]
+          ['proxy-cache.size', 0, ['method:getById']],
+          ['proxy-cache.size', 1, ['method:getById']]
         ]);
         done();
       });
