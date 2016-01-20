@@ -1,6 +1,6 @@
 {
   "name": "proxy-cache",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "repository": "https://github.com/ivolo/proxy-cache.git",
   "keywords": [
     "cache",
