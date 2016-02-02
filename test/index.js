@@ -1,5 +1,7 @@
 
 var assert = require('assert');
+var clone = require('clone');
+var Batch = require('batch');
 var cache = require('..');
 
 
@@ -15,17 +17,21 @@ DB.prototype.save = function (obj) {
 };
 
 DB.prototype.getAndError = function (id, callback) {
-  return callback(new Error('DB Failure'));
+  setImmediate(function(){
+    callback(new Error('DB Failure'));
+  });
 };
 
 DB.prototype.getById = function (id, callback) {
-  this.queries += 1;
-  return callback(null, this.db[id]);
+  var self = this;
+  setImmediate(function(){
+    self.queries += 1;
+    callback(null, self.db[id]);
+  });
 };
 
 DB.prototype.getByType = function (type, id, callback) {
-  this.queries += 1;
-  return callback(null, this.db[id]);
+  this.getById(id, callback);
 };
 
 describe('proxy-cache', function () {
@@ -209,6 +215,27 @@ describe('proxy-cache', function () {
       });
     });
   });
+
+  it('should queue extra callbacks', function(done){
+    var db = cache(new DB, ['getById']);
+    var item = { stuff: [], id: 1 };
+    db.save(item);
+
+    var batch = new Batch;
+
+    for (var i = 0; i < 10; i++) {
+      batch.push(function(done){
+        db.getById(1, done);
+      });
+    }
+
+    batch.end(function(err, results){
+      if (err) return done(err);
+      assert.equal(10, results.length);
+      assert.equal(1, db.parent.queries, 'expected a single query');
+      done();
+    });
+  });
 });
 
 function memstats(){
@@ -227,4 +254,3 @@ function memstats(){
     }
   };
 }
-

@@ -15,6 +15,7 @@
     "ms": "~0.6.1"
   },
   "devDependencies": {
+    "batch": "^0.5.3",
     "mocha": "*"
   },
   "main": "lib/index"
